@@ -30,6 +30,10 @@ class Velo16_PointCloud():
         for i in range(16):
             distance1=frame[4+idBlock*100+3*i]+256*frame[5+idBlock*100+3*i]
             distance2=frame[52+idBlock*100+3*i]+256*frame[53+idBlock*100+3*i]
+            if (distance1==0):
+                distance1=np.nan
+            if (distance2==0):
+                distance2=np.nan
             layerPoint1+=[distance1]
             layerPoint2+=[distance2]
         return [layerPoint1,layerPoint2]
@@ -103,16 +107,19 @@ class Velo16_PointCloud():
             plt.plot(matrix[:,n+3])
         plt.show()
         
+    def plotChannel2(self,n,k, matrix):
+        #plt.plot(matrix[2:,n]-matrix[:-2,n])
+        if n==0:
+            plt.plot(matrix[:,n])
+        else:
+            for i in range(k):
+                plt.plot(np.multiply(matrix[:,n],np.cos(np.divide(matrix[:,0],18000/np.pi))),np.multiply(matrix[:,n],np.sin(np.divide(matrix[:,0],18000/np.pi))))
+                n+=1
+                #plt.plot(np.divide(matrix[:,0],18000/np.pi))
+                #plt.plot(np.cos(np.divide(matrix[:,0],18000/np.pi)))
+        plt.show()
         
-    
-
-if __name__ == "__main__":
-    print ("Hello World")
-    test= Velo16_PointCloud()
-    test.readFile("06.pcap")
-    len(test.layer1)
-    test.readView()
-    
+def testingChannelsCartesian(test):
     while(len(test.layer1)>0):
         test.layer2matrix()
         test.plotChannel(0,test.matrix1)
@@ -121,6 +128,25 @@ if __name__ == "__main__":
         test.plotChannel(9,test.matrix1)
         test.plotChannel(13,test.matrix1)
         test.readView(True)
+        
+def testingChannelsCylindrical(test,n,k):
+    while(len(test.layer1)>0):
+        test.layer2matrix()
+        test.plotChannel2(n,k,test.matrix1)
+        test.readView(True)
+
+    
+
+if __name__ == "__main__":
+    print ("Hello World")
+    test= Velo16_PointCloud()
+    test.readFile("06.pcap")
+    len(test.layer1)
+    test.readView()
+    #testingChannelsCartesian(test)
+    testingChannelsCylindrical(test,1,4)
+    
+    
     
     
     print("Bye World")
